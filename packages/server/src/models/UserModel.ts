@@ -124,6 +124,16 @@ export default class UserModel extends BaseModel<User> {
 
 	public async login(email: string, password: string): Promise<User> {
 		const user = await this.loadByEmail(email);
+
+
+		// IF LDAP ACTIVE AUTHENTICATE AGAINST LDAP
+
+		// IF USER NOT IN DB CREATE USER WITH DATA FROM LDAP
+		// -> THEN AUTHENTICATE THE NEW USER
+
+		// USE: https://github.com/ldapts/ldapts
+		// CREATE LDAPService that handles all operations to use here
+
 		if (!user) return null;
 		if (!checkPassword(password, user.password)) return null;
 		return user;

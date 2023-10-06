@@ -105,6 +105,15 @@ const defaultEnvValues: EnvVariables = {
 
 	USER_DATA_AUTO_DELETE_ENABLED: false,
 	USER_DATA_AUTO_DELETE_AFTER_DAYS: 90,
+
+	// ==================================================
+	// LDAP configuration
+	// ==================================================
+
+	LDAP_ENABLED: false,
+	LDAP_CREATE_USER: false,
+	LDAP_SERVER: '',
+	LDAP_SERVER_FALLBACK: '',
 };
 
 export interface EnvVariables {
@@ -162,6 +171,13 @@ export interface EnvVariables {
 
 	USER_DATA_AUTO_DELETE_ENABLED: boolean;
 	USER_DATA_AUTO_DELETE_AFTER_DAYS: number;
+
+	LDAP_ENABLED: boolean;
+	LDAP_CREATE_USER: boolean;
+	LDAP_SERVER: string;
+	LDAP_SERVER_FALLBACK: string;
+
+
 }
 
 const parseBoolean = (s: string): boolean => {

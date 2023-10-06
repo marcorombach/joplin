@@ -39,6 +39,7 @@
     "jquery": "3.7.1",
     "knex": "2.5.1",
     "koa": "2.14.2",
+    "ldapjs": "3.0.5",
     "markdown-it": "13.0.1",
     "mustache": "4.2.0",
     "nanoid": "2.1.11",
