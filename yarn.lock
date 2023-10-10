@@ -5141,6 +5141,7 @@ __metadata:
     "@types/jest-expect-message": 1.0.4
     "@types/jsdom": 21.1.3
     "@types/koa": 2.13.9
+    "@types/ldapjs": 3.0.2
     "@types/markdown-it": 12.2.3
     "@types/mustache": 4.2.2
     "@types/nodemailer": 6.4.10
@@ -8205,6 +8206,15 @@ __metadata:
     "@types/koa-compose": "*"
     "@types/node": "*"
   checksum: af9cd599c8e17e2ae0f4168a61d964e343f713d002b65fd995658d7addc6551ccadecfd32b3405cf44e4d360178ee4f972d6881533548261ae1f636a655d24b1
+  languageName: node
+  linkType: hard
+
+"@types/ldapjs@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@types/ldapjs@npm:3.0.2"
+  dependencies:
+    "@types/node": "*"
+  checksum: 0839acb3c46aa231577266c46700b44cfeb5cc77cfb854be6dac25bf1346cd0b5c83e3671fd6a78769c7702a1eb610d5f08b68e2583bb5c13d214eb0558c3d36
   languageName: node
   linkType: hard
 

@@ -28,6 +28,8 @@ import changeEmailNotificationTemplate from '../views/emails/changeEmailNotifica
 import { NotificationKey } from './NotificationModel';
 import prettyBytes = require('pretty-bytes');
 import { Env } from '../utils/types';
+import config from '../config';
+import ldapjs = require('ldapjs');
 
 const logger = Logger.create('UserModel');
 
@@ -125,14 +127,63 @@ export default class UserModel extends BaseModel<User> {
 	public async login(email: string, password: string): Promise<User> {
 		const user = await this.loadByEmail(email);
 
+		if (config().ldap.enabled) {
 
-		// IF LDAP ACTIVE AUTHENTICATE AGAINST LDAP
+			if (password === '') {
+				logger.error('no password entered');
+				throw new Error('no password entered');
+			}
 
-		// IF USER NOT IN DB CREATE USER WITH DATA FROM LDAP
-		// -> THEN AUTHENTICATE THE NEW USER
+			const client = ldapjs.createClient({
+				url: config().ldap.hosts,
+			});
 
-		// USE: https://github.com/ldapts/ldapts
-		// CREATE LDAPService that handles all operations to use here
+			client.on('connectError', () => {
+				logger.error('ldap connection error');
+				return null;
+			});
+
+			const opts: ldapjs.SearchOptions = {
+				filter: `(${config().ldap.mailAttribute}=${email})`,
+				scope: 'sub',
+				attributes: ['dn'],
+			};
+
+			client.search(config().ldap.baseDN, opts, (e, res) => {
+				if (e) {
+					logger.error('ldap search error');
+				}
+
+				res.on('searchEntry', (entry) => {
+					logger.info(`objectName DN: ${JSON.stringify(entry.pojo.objectName)}`);
+					logger.info(`pojo: ${JSON.stringify(entry.pojo)}`);
+
+					client.bind(entry.pojo.objectName, password, (e) => {
+						if (e) {
+							logger.error(e.message);
+							return null;
+						} else {
+							if (config().ldap.userCreation && !user) {
+								const ldapUser: User = {};
+								ldapUser.email = email;
+								ldapUser.password = password;
+								ldapUser.email_confirmed = 1;
+								const savedUser = this.save(ldapUser);
+
+								logger.info('ldap authentication and user creation successful');
+								return savedUser;
+							} else {
+								logger.info('ldap authentication successful');
+								return user;
+							}
+						}
+					});
+				});
+				res.on('error', (e) => {
+					logger.error(e.message);
+				});
+			});
+		}
 
 		if (!user) return null;
 		if (!checkPassword(password, user.password)) return null;

@@ -1,5 +1,5 @@
 import { rtrimSlashes } from '@joplin/lib/path-utils';
-import { Config, DatabaseConfig, DatabaseConfigClient, Env, MailerConfig, RouteType, StripeConfig } from './utils/types';
+import { Config, DatabaseConfig, DatabaseConfigClient, Env, MailerConfig, LdapConfig, RouteType, StripeConfig } from './utils/types';
 import * as pathUtils from 'path';
 import { loadStripeConfig, StripePublicConfig } from '@joplin/lib/utils/joplinCloud';
 import { EnvVariables } from './env';
@@ -111,6 +111,16 @@ function baseUrlFromEnv(env: EnvVariables, appPort: number): string {
 	}
 }
 
+function ldapConfigFromEnv(env: EnvVariables): LdapConfig {
+	return {
+		enabled: env.LDAP_ENABLED,
+		userCreation: env.LDAP_CREATE_USER,
+		hosts: [env.LDAP_SERVER, env.LDAP_SERVER_FALLBACK],
+		mailAttribute: env.LDAP_MAIL_ATTRIBUTE,
+		baseDN: env.LDAP_BASE_DN,
+	};
+}
+
 let config_: Config = null;
 
 export async function initConfig(envType: Env, env: EnvVariables, overrides: any = null) {
@@ -159,6 +169,7 @@ export async function initConfig(envType: Env, env: EnvVariables, overrides: any
 		storageDriverFallback: parseStorageDriverConnectionString(env.STORAGE_DRIVER_FALLBACK),
 		itemSizeHardLimit: 250000000, // Beyond this the Postgres driver will crash the app
 		maxTimeDrift: env.MAX_TIME_DRIFT,
+		ldap: ldapConfigFromEnv(env),
 		...overrides,
 	};
 }

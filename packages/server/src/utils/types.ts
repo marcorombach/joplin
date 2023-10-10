@@ -131,6 +131,14 @@ export interface StorageDriverConfig {
 	bucket?: string;
 }
 
+export interface LdapConfig {
+	enabled: boolean;
+	userCreation: boolean;
+	hosts: string[];
+	mailAttribute: string;
+	baseDN: string;
+}
+
 export interface Config extends EnvVariables {
 	appVersion: string;
 	joplinServerVersion: string; // May be different from appVersion, if this is a fork of JS
@@ -165,6 +173,7 @@ export interface Config extends EnvVariables {
 	storageDriverFallback: StorageDriverConfig;
 	itemSizeHardLimit: number;
 	maxTimeDrift: number;
+	ldap: LdapConfig;
 }
 
 export enum HttpMethod {

@@ -114,6 +114,8 @@ const defaultEnvValues: EnvVariables = {
 	LDAP_CREATE_USER: false,
 	LDAP_SERVER: '',
 	LDAP_SERVER_FALLBACK: '',
+	LDAP_MAIL_ATTRIBUTE: 'mail',
+	LDAP_BASE_DN: '',
 };
 
 export interface EnvVariables {
@@ -176,6 +178,8 @@ export interface EnvVariables {
 	LDAP_CREATE_USER: boolean;
 	LDAP_SERVER: string;
 	LDAP_SERVER_FALLBACK: string;
+	LDAP_MAIL_ATTRIBUTE: string;
+	LDAP_BASE_DN: string;
 
 
 }
