@@ -1,6 +1,6 @@
 {
   "name": "@joplin/app-desktop",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "description": "Joplin for Desktop",
   "main": "main.js",
   "private": true,
@@ -118,8 +118,8 @@
     "@joplin/tools": "~2.13",
     "@testing-library/react-hooks": "8.0.1",
     "@types/jest": "29.5.4",
-    "@types/node": "18.17.16",
-    "@types/react": "18.2.21",
+    "@types/node": "18.17.18",
+    "@types/react": "18.2.22",
     "@types/react-redux": "7.1.26",
     "@types/styled-components": "5.1.27",
     "electron": "25.8.1",
