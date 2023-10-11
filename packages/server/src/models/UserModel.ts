@@ -29,7 +29,7 @@ import { NotificationKey } from './NotificationModel';
 import prettyBytes = require('pretty-bytes');
 import { Env } from '../utils/types';
 import config from '../config';
-import ldapjs = require('ldapjs');
+import { Client } from 'ldapts';
 
 const logger = Logger.create('UserModel');
 
@@ -134,60 +134,53 @@ export default class UserModel extends BaseModel<User> {
 				throw new Error('no password entered');
 			}
 
-			const client = ldapjs.createClient({
-				url: config().ldap.hosts,
+			const host = config().ldap.hosts[0];
+
+			const client = new Client({
+				url: host,
+				timeout: 2000,
+				connectTimeout: 1000,
 			});
 
-			client.on('connectError', () => {
-				logger.error('ldap connection error');
-				return null;
-			});
+			try {
+				const searchResults = await client.search(config().ldap.baseDN, {
+					filter: `(${config().ldap.mailAttribute}=${email})`,
+					attributes: ['dn'],
+				});
 
-			const opts: ldapjs.SearchOptions = {
-				filter: `(${config().ldap.mailAttribute}=${email})`,
-				scope: 'sub',
-				attributes: ['dn'],
-			};
+				logger.info(JSON.stringify(searchResults.searchEntries));
 
-			client.search(config().ldap.baseDN, opts, (e, res) => {
-				if (e) {
-					logger.error('ldap search error');
+				let isAuthenticated;
+				try {
+					await client.bind(searchResults.searchEntries[0].dn, password);
+					isAuthenticated = true;
+				} catch (ex) {
+					isAuthenticated = false;
+				} finally {
+					await client.unbind();
 				}
+				if (isAuthenticated) {
+					if (config().ldap.userCreation && !user) {
+						const ldapUser: User = {};
+						ldapUser.email = email;
+						ldapUser.password = password;
+						ldapUser.email_confirmed = 1;
 
-				res.on('searchEntry', (entry) => {
-					logger.info(`objectName DN: ${JSON.stringify(entry.pojo.objectName)}`);
-					logger.info(`pojo: ${JSON.stringify(entry.pojo)}`);
-
-					client.bind(entry.pojo.objectName, password, (e) => {
-						if (e) {
-							logger.error(e.message);
-							return null;
-						} else {
-							if (config().ldap.userCreation && !user) {
-								const ldapUser: User = {};
-								ldapUser.email = email;
-								ldapUser.password = password;
-								ldapUser.email_confirmed = 1;
-								const savedUser = this.save(ldapUser);
-
-								logger.info('ldap authentication and user creation successful');
-								return savedUser;
-							} else {
-								logger.info('ldap authentication successful');
-								return user;
-							}
-						}
-					});
-				});
-				res.on('error', (e) => {
-					logger.error(e.message);
-				});
-			});
+						const savedUser: User = await this.save(ldapUser);
+						logger.info('ldap authentication and user creation successful');
+						return savedUser;
+					}
+					return user;
+				}
+			} finally {
+				await client.unbind();
+			}
 		}
 
 		if (!user) return null;
 		if (!checkPassword(password, user.password)) return null;
 		return user;
+
 	}
 
 	public fromApiInput(object: User): User {

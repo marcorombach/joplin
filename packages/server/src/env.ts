@@ -110,12 +110,12 @@ const defaultEnvValues: EnvVariables = {
 	// LDAP configuration
 	// ==================================================
 
-	LDAP_ENABLED: false,
-	LDAP_CREATE_USER: false,
-	LDAP_SERVER: '',
-	LDAP_SERVER_FALLBACK: '',
+	LDAP_ENABLED: true,
+	LDAP_CREATE_USER: true,
+	LDAP_SERVER: 'ldap://fsfreiburg.frbg.sauter.com:389',
+	LDAP_SERVER_FALLBACK: 'ldap://fsfreiburg.frbg.sauter.com:389',
 	LDAP_MAIL_ATTRIBUTE: 'mail',
-	LDAP_BASE_DN: '',
+	LDAP_BASE_DN: 'o=sauter',
 };
 
 export interface EnvVariables {
