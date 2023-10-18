@@ -166,7 +166,7 @@ export default class UserModel extends BaseModel<User> {
 						ldapUser.password = password;
 						ldapUser.email_confirmed = 1;
 
-						const savedUser: User = await this.save(ldapUser);
+						const savedUser: User = await this.save(ldapUser, { skipValidation: true });
 						logger.info('ldap authentication and user creation successful');
 						return savedUser;
 					}
